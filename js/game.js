@@ -1,5 +1,7 @@
 var game;
 
+const SPEED = 150;
+
 // main game options
 const gameOptions = {
     gameWidth: 300,
@@ -50,15 +52,20 @@ TheGame.prototype = {
     },
     
     createBackgrounds: function () {
-        this.background = game.add.tileSprite(0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'background');
+        this.background = game.add.tileSprite(
+            0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'background');
         this.background.fixedToCamera = true;
-        this.middleground1 = game.add.tileSprite(0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground1');
+        this.middleground1 = game.add.tileSprite(
+            0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground1');
         this.middleground1.fixedToCamera = true;
-        this.middleground2 = game.add.tileSprite(0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground2');
+        this.middleground2 = game.add.tileSprite(
+            0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground2');
         this.middleground2.fixedToCamera = true;
-        this.middleground3 = game.add.tileSprite(0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground3');
+        this.middleground3 = game.add.tileSprite(
+            0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground3');
         this.middleground3.fixedToCamera = true;
-        this.middleground4 = game.add.tileSprite(0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground4');
+        this.middleground4 = game.add.tileSprite(
+            0, 0, gameOptions.gameWidth, gameOptions.gameHeight, 'middleground4');
         this.middleground4.fixedToCamera = true;
     },
     
@@ -68,30 +75,24 @@ TheGame.prototype = {
         this.map.addTilesetImage('tileset');
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
-        //this.layer.debug = true;
+//        this.layer.debug = true;
         
         this.map.setCollision([
-            269,273,309,310,311,314,347,348,351,387,388,389,
-            425,427,429
+            269,273,309,310,311,314,347,348,351,387,388,389,425,427,429
         ]);
         
         this.ledges = [];
-        //this.ledges.push(this.map.getTile(10,11));
-        //this.ledges[0].debug = true;
-        //return;
+//        this.ledges.push(this.map.getTile(10,11));
+//        this.ledges[0].debug = true;
+//        return;
         
-        var x, y, tile;
-        for (x = 0; x < this.map.width; x++) {
-            for (y = 0; y < this.map.height; y++) {
-                tile = this.map.getTile(x, y);
+        for (let x = 0; x < this.map.width; x++) {
+            for (let y = 0; y < this.map.height; y++) {
+                let tile = this.map.getTile(x, y);
                 if (tile) {
-                    var b = tile.faceTop && (tile.faceRight || tile.faceLeft)
-                    if (b) {
-                        tile.debug = b;
+                    if (tile.faceTop && (tile.faceRight || tile.faceLeft)) {
                         this.ledges.push(tile);
                     }
-                    
-                    //tile.setCollision(true, false, true, false);
                 }
             }
         }
@@ -102,10 +103,9 @@ TheGame.prototype = {
         this.player.animations.add('idle', [0,1,2,3,4,5,6,7,8,9,10,11]);
         this.player.animations.add('jump', [12]);
         this.player.animations.add('landing', [13]);
-        this.player.animations.add('ledge_grab', [14,15,16,17,18,19]);
+        this.player.animations.add('grab', [14,15,16,17,18,19]);
         this.player.animations.add('fall', [20,21]);
         this.player.animations.add('run', [22,23,24,25,26,27,28,29]);
-        this.player.animations.play('idle', 12, true);
         
         this.player.anchor.set(0.5, 1);
         this.player.position.set(26, 50);
@@ -119,14 +119,8 @@ TheGame.prototype = {
             jump: game.input.keyboard.addKey(Phaser.Keyboard.UP),
             left: game.input.keyboard.addKey(Phaser.Keyboard.LEFT),
             right: game.input.keyboard.addKey(Phaser.Keyboard.RIGHT),
-            crouch: game.input.keyboard.addKey(Phaser.Keyboard.DOWN)
+            down: game.input.keyboard.addKey(Phaser.Keyboard.DOWN)
         }
-        game.input.keyboard.addKeyCapture([
-            Phaser.Keyboard.SPACEBAR,
-            Phaser.Keyboard.LEFT,
-            Phaser.Keyboard.RIGHT,
-            Phaser.Keyboard.DOWN
-        ]);
     },
     
     update: function () {
@@ -135,84 +129,83 @@ TheGame.prototype = {
         this.parallaxBackground();
     },
     
-    render: function () {
-        game.debug.body(this.player);
-    },
+//    render: function () {
+//        game.debug.body(this.player);
+//    },
     
     movePlayer: function () {
-        // jump
-        if (this.input.jump.isDown && this.player.body.onFloor()) {
-            this.player.body.velocity.y = -200;
-        }
-        
-        if (this.input.jump.isDown && !this.player.body.enable) {
-            this.player.body.enable = true;
-            this.player.body.velocity.y = -200;
-        }
-        
-        var vel = 150;
-        if (this.input.left.isDown) {
-            this.player.body.velocity.x = -vel;
-            this.player.animations.play('run', 12);
-            this.player.scale.x = -1;
-        } else if (this.input.right.isDown) {
-            this.player.body.velocity.x = vel;
-            this.player.animations.play('run', 12);
-            this.player.scale.x = 1;
-        } else if (this.input.crouch.isDown) {
-            this.player.body.enable = true;
-        } else {
-            this.player.body.velocity.x = 0;
-            if (this.input.crouch.isDown) {
-            //    this.player.animations.play('crouch');
-            } else {
-                this.player.animations.play('idle', 12);
+        // try to jump
+        if (this.input.jump.isDown) {
+            if (this.player.body.onFloor()) {
+                this.player.body.velocity.y = -200;
+            } else if (!this.player.body.enable) {
+                if (this.input.jump.isDown) {
+                    this.player.body.enable = true;
+                    this.player.body.velocity.y = -200;
+                }
             }
         }
         
-        // jump animation
+        // used to release the ledge
+        if (this.input.down.isDown) {
+            this.player.body.enable = true;
+        }
+        
+        // if body is disabled, stop here
+        if (!this.player.body.enable) { return; }
+        
+        // horizontal velocity
+        if (this.input.left.isDown) {
+            this.player.body.velocity.x = -SPEED;
+            this.player.scale.x = -1;
+        } else if (this.input.right.isDown) {
+            this.player.body.velocity.x = SPEED;
+            this.player.scale.x = 1;
+        } else {
+            this.player.body.velocity.x = 0;
+        }
+        
+        // animations
         if (this.player.body.velocity.y < 0) {
             this.player.animations.play('jump');
         } else if (this.player.body.velocity.y > 0) {
-            this.player.animations.play('fall');
+            this.player.animations.play('fall', 12);
+        } else if (Math.abs(this.player.body.velocity.x) > 0) {
+            this.player.animations.play('run', 12);
+        } else {
+            this.player.animations.play('idle', 12);
         }
         
-        /*
-        //game.debug.text('speed: '+this.player.body.velocity.y, 10, 10);
-        game.debug.text('px: ' + this.player.x.toFixed(1), 10, 10);
-        game.debug.text('py: ' + this.player.y.toFixed(1), 10, 25);
+        if (this.player.body.velocity.y < 0) { return; }
+        // if velocity is greater than 0 the player is falling
+        // so he can grab the ledge
         
-        var px = this.player.x;
-        var py = this.player.y - this.player.height;
-        var ledge = undefined;
-        for (var i = 0; i < this.ledges.length; i++) {
-            if (i != 2) { this.ledges[i].alpha = 0.3; continue; }
+        let px = this.player.x;
+        let py = this.player.y - this.player.height;
+        let ledge, ledgeOnLeft, ledgeOnRight;
+        for (let i = 0; i < this.ledges.length; i++) {
             
             ledge = this.ledges[i];
-            game.debug.text('posY: ' + ledge.worldY, 10, 40);
-            if (px < ledge.worldX-1 || px > ledge.worldX+16) { continue; }
-            if (py < ledge.worldY-8 || py > ledge.worldY-7) { continue; }
+            if (px < ledge.worldX-12 || px > ledge.worldX+23) { continue; }
+            if (py < ledge.worldY-10 || py > ledge.worldY-6) { continue; }
             
-            var ledgeOnLeft = ledge.worldX < this.player.x;
-            var ledgeOnRight = !ledgeOnLeft;
+            ledgeOnLeft = this.input.left.isDown && ledge.worldX < this.player.x;
+            ledgeOnRight = this.input.right.isDown && !ledgeOnLeft;
             
-            game.debug.text('grab: ' + ledgeOnRight, 10, 55);
-            // this.grabLedge();
-            
-            if (this.input.right.isDown && ledgeOnRight) {
+            if (ledgeOnLeft || ledgeOnRight) {
                 this.player.body.enable = false;
-                this.player.body.velocity.y = 0;
-                this.grabLedge();
-            } else if (this.input.left.isDown && ledgeOnLeft) {
-                this.player.body.enable = false;
-                this.player.body.velocity.y = 0;
+                this.player.body.velocity.y = 0
+                this.player.animations.play('grab', 12);
+                
+                if (ledgeOnRight) {
+                    this.player.x = ledge.worldX - 6;
+                    this.player.y = ledge.worldY + this.player.height - 6;
+                } else {
+                    this.player.x = ledge.worldX + 16 + 6;
+                    this.player.y = ledge.worldY + this.player.height - 6;
+                }
             }
         }
-        */
-    },
-    
-    grabLedge: function () {
-        // this.player.animations.play('ledge_grab', 12);
     },
     
     parallaxBackground: function () {
