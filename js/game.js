@@ -78,14 +78,10 @@ TheGame.prototype = {
 //        this.layer.debug = true;
         
         this.map.setCollision([
-            269,273,309,310,311,314,347,348,351,387,388,389,425,427,429
+            49,269,273,309,310,311,314,347,348,351,387,388,389,425,427,429
         ]);
         
         this.ledges = [];
-//        this.ledges.push(this.map.getTile(10,11));
-//        this.ledges[0].debug = true;
-//        return;
-        
         for (let x = 0; x < this.map.width; x++) {
             for (let y = 0; y < this.map.height; y++) {
                 let tile = this.map.getTile(x, y);
@@ -108,7 +104,7 @@ TheGame.prototype = {
         this.player.animations.add('run', [22,23,24,25,26,27,28,29]);
         
         this.player.anchor.set(0.5, 1);
-        this.player.position.set(26, 50);
+        this.player.position.set(50, 480);
         game.physics.arcade.enable(this.player);
         this.player.body.gravity.y = 500;
         this.player.body.setSize(12, 28, 6, 6);
